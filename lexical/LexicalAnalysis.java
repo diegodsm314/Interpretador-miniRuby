@@ -144,7 +144,7 @@ public class LexicalAnalysis implements AutoCloseable {
                         state=9;
                     } 
                     else{
-                        ungetc();
+                        ungetc(); 
                         state=12;
                     }
                     break;
