@@ -41,28 +41,31 @@ public class LexicalAnalysis implements AutoCloseable {
             
             switch (state) {
                 case 1:
-                    if(c.EQUALS(' ')||c.EQUALS('\t')||c.EQUALS('\n')||c.EQUALS('\r')){
+                    if(c == ' '||c == '\t'||c == '\n'||c == '\r'){
                         state=1;
                     }
-                    else if(c.EQUALS('#')){
+                    else if(c == '#'){
                         state=2;
                     }
-                    else if(c.EQUALS('.')){
+                    else if(c == '.'){
+                        lex.token += (char)c;
                         state=3;
                     }
-                    else if(c.EQUALS('=')){
+                    else if(c == '='){
+                        lex.token += (char)c;
                         state=5;
                     }
-                    else if(c.EQUALS('<')||c.EQUALS('>')){
+                    else if(c == '<'||c == '>'){
+                        lex.token += (char)c;
                         state=6;
                     }
-                    else if(c.EQUALS('*')){
+                    else if(c == '*'){
                         state=7;
                     }
-                    else if(c.EQUALS('!')){
+                    else if(c == '!'){
                         state=8;
                     }
-                    else if(Character.isLetter(c)||c.EQUALS('_')){
+                    else if(Character.isLetter(c)||c == ('_')){
                         lex.token += (char)c;
                         state=9;
                     }
@@ -70,19 +73,21 @@ public class LexicalAnalysis implements AutoCloseable {
                         lex.token += (char)c;
                         state=10;
                     }
-                    else if(c.EQUALS("'")){
+                    else if(c == '\''){
                         state=11;
                     }
-                    if(c.EQUALS(';')||c.EQUALS(',')||
-                        c.EQUALS('%')||c.EQUALS('/')||
-                        c.EQUALS('[')||c.EQUALS(']')||
-                        c.EQUALS('(')||c.EQUALS(')')||
-                        c.EQUALS('+')||c.EQUALS('-')){
+                    if(c == ';'||c == ','||
+                        c == '%'||c == '/'||
+                        c == '['||c == ']'||
+                        c == '('||c == ')'||
+                        c == '+'||c == '-'){
+                        lex.token += (char)c;
                         state=12;
                     }
                     break;
                 case 2:
-                    if(c.EQUALS('\n')){
+                    if(c == '\n'){
+                        this.line++;
                         state=1;
                     } 
                     else{
@@ -90,61 +95,66 @@ public class LexicalAnalysis implements AutoCloseable {
                     }
                     break;
                 case 3:
-                    if(c.EQUALS('.')){
+                    if(c == '.'){
+                        lex.token += (char)c;
                         state=4;
                     }
                     else{
-                        ungetc();
+                        ungetc(c);
                         state=12;
                     }
                     break;
                 case 4:
-                    if(c.EQUALS('.')){
+                    if(c == '.'){
                         state=12;
                     }
                     else{
-                        ungetc();
+                        ungetc(c);
                         state=12;
                     }
                     break;
                 case 5:
-                    if(c.EQUALS('=')){
+                    if(c == '='){
+                        lex.token += (char)c;
                         state=6;
                     }
                     else{
-                        ungetc();
+                        ungetc(c);
                         state=12;
                     }
                     break;
                 case 6:
-                    if(c.EQUALS('=')){
+                    if(c == '='){
+                        lex.token += (char)c;
                         state=12;
                     }
                     else{
-                        ungetc();
+                        ungetc(c);
                         state=12;
                     }
                     break;
                 case 7:
-                    if(c.EQUALS('*')){
+                    if(c == '*'){
                         state=12;
                     }
                     else{
-                        ungetc();
+                        ungetc(c);
                         state=12;
                     }
                     break;
                 case 8:
-                    if(c.EQUALS('=')){
+                    if(c == '='){
+                        lex.token += (char)c;
                         state=12;
                     }
                     break;
                 case 9:
-                    if(c.EQUALS('_')||Character.isLetter(c)||Character.isDigit(c)){
+                    if(c == '_'||Character.isLetter(c)||Character.isDigit(c)){
+                        lex.token += (char)c;
                         state=9;
                     } 
                     else{
-                        ungetc(); 
+                        ungetc(c); 
                         state=12;
                     }
                     break;
@@ -153,15 +163,18 @@ public class LexicalAnalysis implements AutoCloseable {
                         state=10;
                     } 
                     else{
-                        ungetc();
+                        ungetc(c);
+                        lex.type = TokenType.INTEGER;
                         state=13;
                     }
                     break;
                 case 11:
-                    if(c.EQUALS("'")){
+                    if(c == '\''){
+                        lex.type = TokenType.STRING;
                         state=13;
                     } 
                     else{
+                        lex.token += (char)c;
                         state=11;
                     }
                     break;
