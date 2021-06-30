@@ -1,5 +1,7 @@
 package syntatic;
 
+import javax.lang.model.type.TypeKind;
+
 import interpreter.command.Command;
 import lexical.Lexeme;
 import lexical.LexicalAnalysis;
@@ -29,9 +31,10 @@ public class SyntaticAnalysis {
         // System.out.println("Expected (..., " + type + "), found (\"" + 
         //     current.token + "\", " + current.type + ")");
         if (type == current.type) {
-            current = lex.nextToken();
+            advance();
         } else {
             showError();
+            
         }
     }
 
@@ -54,4 +57,57 @@ public class SyntaticAnalysis {
         System.exit(1);
     }
 
+    public void procCmdList() {
+        while(true){
+            //TO_Do
+        }
+    }
+
+    public void procCmd(TokenType type) {
+        if(type == TokenType.IF){
+            procIf();
+        }
+        else if(type == TokenType.UNLESS){
+            procUnless();
+        }
+        else if(type == TokenType.WHILE){
+            procWhile();
+        }
+        else if(type == TokenType.UNTIL){
+            procUntil();
+        }
+        else if(type == TokenType.FOR){
+            procFor();
+        }
+        else if(type == TokenType.OUTPUT){ //Não existe Output
+            procOutput();
+        }
+        else if(type == TokenType.ASSIGN){
+            procAssign();
+        }
+        else{
+            showError();
+        }
+    }
+
+    public void procIf() {
+        eat(TokenType.IF);
+        procBoolExpr();
+        eat(TokenType.THEN);
+        procCmdList();
+        while(current.type == TokenType.ELSIF){
+            eat(TokenType.ELSIF);
+            procBoolExpr();
+            eat(TokenType.THEN);
+            procCmdList();
+        }
+        if(current.type == TokenType.ELSE){
+            advance();
+            procCmdList();
+        }
+        eat(TokenType.END);
+    }
+
+    
 }
+
