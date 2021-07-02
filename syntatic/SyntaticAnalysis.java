@@ -58,31 +58,38 @@ public class SyntaticAnalysis {
     }
 
     public void procCmdList() {
-        while(true){
-            //TO_Do
+        while(current.type == TokenType.UNLESS ||
+         current.type == TokenType.WHILE || 
+         current.type == TokenType.IF ||
+         current.type == TokenType.UNTIL ||
+         current.type == TokenType.FOR ||
+         current.type == TokenType.PRINT ||
+         current.type == TokenType.PUTS ||
+         current.type == TokenType.ASSIGN){
+            procCmd();
         }
     }
 
-    public void procCmd(TokenType type) {
-        if(type == TokenType.IF){
+    public void procCmd() {
+        if(current.type == TokenType.IF){
             procIf();
         }
-        else if(type == TokenType.UNLESS){
+        else if(current.type == TokenType.UNLESS){
             procUnless();
         }
-        else if(type == TokenType.WHILE){
+        else if(current.type == TokenType.WHILE){
             procWhile();
         }
-        else if(type == TokenType.UNTIL){
+        else if(current.type == TokenType.UNTIL){
             procUntil();
         }
-        else if(type == TokenType.FOR){
+        else if(current.type == TokenType.FOR){
             procFor();
         }
-        else if(type == TokenType.OUTPUT){ //Não existe Output
+        else if(current.type == TokenType.PUTS || current.type == TokenType.PRINT){ //Não existe Output
             procOutput();
         }
-        else if(type == TokenType.ASSIGN){
+        else if(current.type == TokenType.ASSIGN){
             procAssign();
         }
         else{
@@ -108,6 +115,137 @@ public class SyntaticAnalysis {
         eat(TokenType.END);
     }
 
-    
+    public void procUnless() {
+        eat(TokenType.UNLESS);
+        procBoolExpr();
+        eat(TokenType.THEN);
+        procCmdList();
+        if(current.type == TokenType.ELSE){
+            advance();
+            procCmdList();
+        }
+        eat(TokenType.END);
+    }
+
+    public void procWhile() {
+        eat(TokenType.WHILE);
+        procBoolExpr();
+        if(current.type == TokenType.DO){
+            eat(TokenType.DO);
+        }
+        procCmdList();
+        eat(TokenType.END);
+    }
+
+    public void procUntil() {
+        eat(TokenType.UNTIL);
+        procBoolExpr();
+        if(current.type == TokenType.DO){
+            eat(TokenType.DO);
+        }
+        procCmdList();
+        eat(TokenType.END);
+    }
+
+    public void procFor() {
+        eat(TokenType.FOR);
+        procId();
+        eat(TokenType.IN);
+        procExpr();
+        if(current.type == TokenType.DO){
+            eat(TokenType.DO);
+        }
+        procCmdList();
+        eat(TokenType.END);
+    }
+
+    public void procOutput() {                          //output com problemas
+        if(current.type == TokenType.PUTS){
+            eat(TokenType.PUTS);
+            procExpr();
+        }
+        else  if(current.type == TokenType.PRINT){
+            eat(TokenType.PRINT);
+        }
+        eat(TokenType.SEMI_COLON);
+    }
+
+    public void procAssign() {
+        //TO_do
+    }
+
+    public void procPost() {
+        if(current.type == TokenType.IF){
+            eat(TokenType.IF);
+            procBoolExpr();
+        }
+        else if(current.type == TokenType.UNLESS){
+            eat(TokenType.UNLESS);
+            procBoolExpr();
+        }
+    }
+
+    public void procBoolExpr() {
+        if(current.type==TokenType.NOT){
+            eat(TokenType.NOT);
+        }
+        procCmpExpr();
+        if(current.type ==  TokenType.AND){
+            eat(TokenType.AND);
+            procBoolExpr();
+        }
+        else if(current.type == TokenType.OR){
+            eat(TokenType.OR);
+            procBoolExpr();
+        }
+    }
+
+    public void procCmpExpr() {
+        procExpr();
+        if(current.type == TokenType.EQUALS ||
+            current.type == TokenType.NOT_EQUALS || 
+            current.type == TokenType.LOWER ||  
+            current.type == TokenType.GREATER || 
+            current.type == TokenType.LOWER_EQ || 
+            current.type == TokenType.GREATER_EQ || 
+            current.type == TokenType.CONTAINS){
+                advance();
+        }
+        procExpr();
+    }
+
+    public void procExpr() {
+        procArith();
+        if(current.type == TokenType.RANGE_WITH|| current.type == TokenType.RANGE_WITHOUT){
+            procArith();
+        }
+    }
+
+    public void procArith() {
+        procTerm();
+        while(current.type == TokenType.ADD || current.type==TokenType.SUB)
+            procTerm();
+    }
+
+    public void procTerm() {
+        procPower();
+        while(current.type == TokenType.MUL|| current.type == TokenType.DIV || current.type == TokenType.MOD)
+            procPower();
+    }
+
+    public void procPower() {
+        procFactor();
+        while(current.type == TokenType.EXP)
+            procFactor();
+    }
+
+    public void procFactor() {
+        if(current.type == TokenType.ADD || current.type == TokenType.SUB){
+            advance();
+        }
+        //TO_DO
+    }
+
+
 }
 
